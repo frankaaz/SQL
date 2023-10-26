@@ -1,0 +1,59 @@
+#In this project, I'm querying and analyzing a database with multiple tables in it to obtain statistics about customer and order data.
+
+#1. Overview of the January Sales.
+SELECT *
+FROM "JanSales"
+
+#2. Amount of orders that were placed in January.
+SELECT COUNT(orderID)
+FROM "JanSales"
+WHERE length(orderID) = 6
+AND orderid <> 'Order ID';
+
+#3. Orders that were specifically for an iPhone.
+SELECT COUNT(orderID)
+FROM "JanSales"
+WHERE Product = 'iPhone'
+AND length(orderID) = 6
+AND orderid <> 'Order ID';
+
+#4. Show the account numbers for all the orders paced in February.
+--1st, overview of February sales--
+SELECT *
+FROM "FebSales";
+
+--2nd, Join statement to determine the account numbers with orders in February.
+SELECT DISTINCT acctnum
+FROM "customers"
+INNER JOIN "FebSales"
+ON customers.order_id = FebSales.orderID
+WHERE length(orderID) = 6
+AND orderid <> 'Order ID';
+
+#5. Show the cheapest product sold in January and its price.
+SELECT DISTINCT Product, price
+FROM "JanSales"
+ORDER BY price ASC
+LIMIT 1;
+
+#6. Show the revenue of each product (revenue as total quantity times price).
+SELECT Product, sum(Quantity), price, sum(Quantity)*price AS revenue
+From "JanSales"
+WHERE Product <> ''
+AND Product <> 'Product'
+GROUP BY Product;
+
+#7. Show the products sold at 548 Lincoln St, Seattle, WA 98101, quantity sold, and revenue.
+SELECT Product, sum(Quantity), price, sum(Quantity)*price AS revenue
+FROM "FebSales"
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+GROUP BY Product;
+
+#8. Show how many customers ordered more than 2 products, and the average amount spent for all of them.
+SELECT count(DISTINCT cust.acctnum), avg(Feb.quantity*Feb.price)
+FROM BIT_DB.FebSales Feb
+LEFT JOIN BIT_DB.customers cust
+ON FEB.orderid=cust.order_id
+WHERE Feb.Quantity>2
+AND length(FEB.orderid) = 6
+AND Feb.orderid <> 'Order ID'
