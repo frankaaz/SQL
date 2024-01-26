@@ -18,15 +18,32 @@ WHERE i.BillingCountry = "Brazil"
 ORDER BY FullName;
 
 -Show the Employees who are Sales Agents.
+SELECT *
+FROM employees
+WHERE Title = "Sales Support Agent"
+
+-Show Employees who also have a SupportRepId
 SELECT e.EmployeeId, e.LastName, e.FirstName, e.Title, c.SupportRepId
 FROM employees e
 JOIN customers c ON e.EmployeeId = c.SupportRepId
 GROUP BY c.SupportRepId
 
 -Find a unique/distinct list of billing countries from the Invoice table.
-
+SELECT DISTINCT BillingCountry
+FROM invoices
 
 -Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agents full name.
+
+WITH invoice_customer AS (
+    SELECT i.InvoiceId, i.CustomerId, c.SupportRepId
+    FROM invoices i
+    LEFT JOIN customers c ON i.CustomerId = c.CustomerId
+    ORDER BY c.SupportRepId
+)
+    
+SELECT invoice_customer.InvoiceId, invoice_customer.CustomerId, e.EmployeeId, e.FirstName || ' ' || e.LastName AS FullName, e.Title
+FROM invoice_customer
+JOIN employees e ON invoice_customer.SupportRepId = e.EmployeeId
 
 
 -Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
